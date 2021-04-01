@@ -18,6 +18,8 @@ Segment(int x, int y){
 
 }
 
+ArrayList<Segment> tailmon = new ArrayList<Segment>();
+
 
 //*
 // ***** GAME VARIABLES *****
@@ -52,6 +54,22 @@ void dropFood() {
   //Set the food in a new random location
     foodX = ((int)random(50)*10);
     foodY = ((int)random(50)*10);
+    
+ /*   switch(direct) {
+  case UP:
+    foodY = head.y-sneksise;
+    break;
+  case DOWN:
+    foodY = head.y+sneksise; 
+    break;
+  case LEFT:
+   foodX = head.x-sneksise; 
+    break;
+  case RIGHT:
+    foodX = head.x+sneksise;
+    break;
+  }
+  */
 }
 
 
@@ -68,7 +86,8 @@ void draw() {
   move();
   drawSnake();
   eat();
-  
+  System.out.println("food: " + foodX + " " + foodY);
+  System.out.println("head: " + head.x + " " + head.y);
   
 }
 
@@ -83,7 +102,7 @@ void drawSnake() {
   //Draw the head of the snake followed by its tail
   fill(color(#E38C8C));
   rect(head.x,head.y,sneksise, sneksise);
-  
+  manageTail();
   
 }
 
@@ -95,17 +114,32 @@ void drawSnake() {
 
 void drawTail() {
   //Draw each segment of the tail 
+  
+  fill(color(#E38C8C));
+  for (int i = 0; i<tailmon.size(); i++){ 
+  rect(tailmon.get(i).x , tailmon.get(i).y ,sneksise, sneksise);
+  }
 
 }
 
 void manageTail() {
   //After drawing the tail, add a new segment at the "start" of the tail and remove the one at the "end" 
   //This produces the illusion of the snake tail moving.
+  checkTailCollision();
+  drawTail();
+  tailmon.add(0, new Segment(head.x, head.y));
+  tailmon.remove(tailmon.size()-1);
   
 }
 
 void checkTailCollision() {
   //If the snake crosses its own tail, shrink the tail back to one segment
+  for (int i = 1; i < tailmon.size(); i++){
+    if ((head.x == tailmon.get(i).x) && (head.y == tailmon.get(i).y)){
+      tailmon.clear();
+      intake = 0;
+  }
+  }
   
 }
 
@@ -156,17 +190,17 @@ void move() {
 
 void checkBoundaries() {
  //If the snake leaves the frame, make it reappear on the other side
-if (head.x > 499) {
+if (head.x > 500) {
   head.x = 0;
 }
 else if (head.x < 0) {
-  head.x = 499;
+  head.x = 500;
 }
-else if (head.y > 499) {
+else if (head.y > 500) {
   head.y = 0;
 }
 else if (head.y < 0) {
-  head.y = 499;
+  head.y = 500;
 }
 }
 
@@ -178,6 +212,7 @@ void eat() {
 if ((head.x == foodX) && (head.y == foodY)){
   intake++;
   dropFood();
+  tailmon.add(new Segment(head.x, head.y));
   
 }
 
